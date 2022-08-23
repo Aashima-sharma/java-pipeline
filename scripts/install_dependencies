@@ -3,7 +3,7 @@
 set -e
 
 CATALINA_HOME=/usr/share/tomcat10.0.8-codedeploy
-TOMCAT_VERSION=10.0.8
+TOMCAT_VERSION=10.0
 
 # Tar file name
 TOMCAT_CORE_TAR_FILENAME="apache-tomcat-$TOMCAT_VERSION.tar.gz"
