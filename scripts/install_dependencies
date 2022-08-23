@@ -27,16 +27,16 @@ fi
 mkdir -p $CATALINA_HOME
 
 # Download the latest Tomcat10 version
-cd /tmp
+cd /opt
 { which wget; } || { yum install wget; }
 wget $TOMCAT_CORE_DOWNLOAD_URL
-if [[ -d /tmp/$TOMCAT_CORE_UNPACKED_DIRNAME ]]; then
-    rm -rf /tmp/$TOMCAT_CORE_UNPACKED_DIRNAME
+if [[ -d /opt/$TOMCAT_CORE_UNPACKED_DIRNAME ]]; then
+    rm -rf /opt/$TOMCAT_CORE_UNPACKED_DIRNAME
 fi
 tar xzf $TOMCAT_CORE_TAR_FILENAME
 
 # Copy over to the CATALINA_HOME
-cp -r /tmp/$TOMCAT_CORE_UNPACKED_DIRNAME/* $CATALINA_HOME
+cp -r /opt/$TOMCAT_CORE_UNPACKED_DIRNAME/* $CATALINA_HOME
 
 # Install Java if not yet installed
 { which java; } || { yum install java; }
