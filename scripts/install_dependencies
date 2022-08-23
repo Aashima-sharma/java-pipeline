@@ -1,70 +1,35 @@
-#!/bin/bash
-
-set -e
-
-CATALINA_HOME=/usr/share/tomcat10.0.8-codedeploy
-TOMCAT_VERSION=10.0.8
-
-# Tar file name
-TOMCAT7_CORE_TAR_FILENAME="apache-tomcat-$TOMCAT_VERSION.tar.gz"
-# Download URL for Tomcat10 core
-TOMCAT7_CORE_DOWNLOAD_URL="https://archive.apache.org/dist/tomcat/tomcat-10/v10.0.8/bin/apache-tomcat-10.0.8.tar.gz"
-# The top-level directory after unpacking the tar file
-TOMCAT7_CORE_UNPACKED_DIRNAME="apache-tomcat-$TOMCAT_VERSION"
-
-
-# Check whether there exists a valid instance
-# of Tomcat7 installed at the specified directory
-[[ -d $CATALINA_HOME ]] && { service tomcat10 status; } && {
-    echo "Tomcat10 is already installed at $CATALINA_HOME. Skip reinstalling it."
-    exit 0
-}
-
-# Clear install directory
-if [ -d $CATALINA_HOME ]; then
-    rm -rf $CATALINA_HOME
+#! /bin/sh
+echo '####################Start automatic deployment####################'
+path=$(pwd) #current path
+backupTime=$(date +'%Y%m%d_%H_%M_%S')
+tomcatPath=/home/dev/apache-tomcat-8.5.42/ #Specify the tomcat file directory name
+cd $tomcatPath/bin || exit #Enter the bin directory of tomcat
+PID=$(ps -fu root|grep tomcat|grep -v grep|awk '{print $2}') # scene
+if [ -z "$PID" ];then
+ echo "no tomcat process"
+else
+ echo "Start safe end process"
+ kill -15 "$PID"
+# ./shutdown.sh #Stop tomcat service
+sleep 5
+  if [ -z "$PID" ];then
+    echo 'process'"$PID"'Has ended safely'
+  else
+    echo 'The process did not end safely. Start forced end'
+    kill -9 "$PID"
+    echo 'process'"$PID"'Has ended'
+  fi
 fi
-mkdir -p $CATALINA_HOME
-
-# Download the latest Tomcat10 version
-cd /tmp
-{ which wget; } || { yum install wget; }
-wget $TOMCAT7_CORE_DOWNLOAD_URL
-if [[ -d /tmp/$TOMCAT10_CORE_UNPACKED_DIRNAME ]]; then
-    rm -rf /tmp/$TOMCAT10_CORE_UNPACKED_DIRNAME
-fi
-tar xzf $TOMCAT10_CORE_TAR_FILENAME
-
-# Copy over to the CATALINA_HOME
-cp -r /tmp/$TOMCAT7_CORE_UNPACKED_DIRNAME/* $CATALINA_HOME
-
-# Install Java if not yet installed
-{ which java; } || { yum install java; }
-
-# Create the service init.d script
-cat > /etc/init.d/tomcat10 <<'EOF'
-#!/bin/bash
-# description: Tomcat10 Start Stop Restart
-# processname: tomcat10
-PATH=$JAVA_HOME/bin:$PATH
-export PATH
-CATALINA_HOME='/usr/share/tomcat10.0.8-codedeploy'
-
-case $1 in
-start)
-sh $CATALINA_HOME/bin/startup.sh
-;;
-stop)
-sh $CATALINA_HOME/bin/shutdown.sh
-;;
-restart)
-sh $CATALINA_HOME/bin/shutdown.sh
-sh $CATALINA_HOME/bin/startup.sh
-;;
-esac
-exit 0
-EOF
-
-# Change permission mode for the service script
-chmod 755 /etc/init.d/tomcat10
+sleep 1 #Sleep for 1s
+cd ../webapps || exit #Enter the webapps directory of tomcat
+rm -fr helloWorld #Delete helloWorld file directory
+echo 'File directory deletion complete'
+mv helloWorld.war ./backup/helloWorld.war."$backupTime" #Backup to backup
+echo 'Backup complete'
+sleep 1 #Sleep for 1s
+cp "$path"/helloWorld.war ./ #Copy war to webapps path
+sleep 1 #Sleep for 1s
+cd ../bin || exit
+./startup.sh #Start tomcat service
+echo '####################End of deployment####################'
 
