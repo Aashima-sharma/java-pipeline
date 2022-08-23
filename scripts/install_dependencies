@@ -39,7 +39,7 @@ tar xzf $TOMCAT_CORE_TAR_FILENAME
 cp -r /opt/$TOMCAT_CORE_UNPACKED_DIRNAME/* $CATALINA_HOME
 
 # Install Java if not yet installed
-{ which java; } || { yum install java; }
+{ which java; } || { apt install default-jdk -y; }
 
 # Create the service init.d script
 cat > /etc/init.d/tomcat <<'EOF'
