@@ -7,7 +7,7 @@ DEPLOY_TO_ROOT='true'
 #CONTEXT_PATH='##CONTEXT_PATH##'
 SERVER_HTTP_PORT='80'
 
-TEMP_STAGING_DIR='/opt/codedeploy-deployment-staging-area'
+TEMP_STAGING_DIR='/tmp/codedeploy-deployment-staging-area'
 WAR_STAGED_LOCATION="$TEMP_STAGING_DIR/SampleMavenTomcatApp.war"
 HTTP_PORT_CONFIG_XSL_LOCATION="$TEMP_STAGING_DIR/configure_http_port.xsl"
 
